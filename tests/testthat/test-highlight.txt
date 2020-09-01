@@ -1,0 +1,41 @@
+> # explicit package
+> cat(highlight("MASS::addterm()"))
+<span class='k'>MASS</span>::<span class='nf'><a href='https://rdrr.io/pkg/MASS/man/addterm.html'>addterm</a></span>()
+
+> cat(highlight("MASS::addterm"))
+<span class='k'>MASS</span>::<span class='k'><a href='https://rdrr.io/pkg/MASS/man/addterm.html'>addterm</a></span>
+
+> cat(highlight("?MASS::addterm"))
+<span class='o'>?</span><span class='k'>MASS</span>::<span class='k'><a href='https://rdrr.io/pkg/MASS/man/addterm.html'>addterm</a></span>
+
+> # implicit package
+> cat(highlight("library(MASS)"))
+<span class='nf'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='k'><a href='http://www.stats.ox.ac.uk/pub/MASS4'>MASS</a></span>)
+
+> cat(highlight("addterm()"))
+<span class='nf'><a href='https://rdrr.io/pkg/MASS/man/addterm.html'>addterm</a></span>()
+
+> cat(highlight("median()"))
+<span class='nf'><a href='https://rdrr.io/r/stats/median.html'>median</a></span>()
+
+> # local package
+> cat(highlight("test::foo()"))
+<span class='k'>test</span>::<span class='nf'><a href='bar.html'>foo</a></span>()
+
+> # operators / special syntax
+> cat(highlight("1 + 2 * 3"))
+<span class='m'>1</span> <span class='o'>+</span> <span class='m'>2</span> <span class='o'>*</span> <span class='m'>3</span>
+
+> cat(highlight("x %in% y"))
+<span class='k'>x</span> <span class='o'>%in%</span> <span class='k'>y</span>
+
+> cat(highlight("if (FALSE) 1"))
+<span class='kr'>if</span> (<span class='kc'>FALSE</span>) <span class='m'>1</span>
+
+> cat(highlight("f <- function(x = 'a') {}"))
+<span class='k'>f</span> <span class='o'>&lt;-</span> <span class='nf'>function</span>(<span class='k'>x</span> = <span class='s'>'a'</span>) {}
+
+> # ansi escapes + unicode
+> cat(highlight("# \033[34mblue\033[39m"))
+<span class='c'># <span style='color: #0000BB;'>blue</span></span>
+
