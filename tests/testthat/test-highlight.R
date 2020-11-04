@@ -71,6 +71,12 @@ test_that("R6 methods don't get linked", {
     highlight("x$get()"),
     "<span class='nv'>x</span><span class='o'>$</span><span class='nf'>get</span><span class='o'>(</span><span class='o'>)</span>"
   )
+
+  expect_equal(
+    highlight("x$library()"),
+    "<span class='nv'>x</span><span class='o'>$</span><span class='kr'>library</span><span class='o'>(</span><span class='o'>)</span>"
+  )
+
 })
 
 test_that("R6 instantiation gets linked", {
@@ -83,4 +89,9 @@ test_that("R6 instantiation gets linked", {
     highlight("new()"),
     "<span class='nf'>new</span><span class='o'>(</span><span class='o'>)</span>"
   )
+})
+
+test_that("ansi escapes are converted to html", {
+  expect_snapshot_output(highlight("# \033[31mhello\033[m"))
+  expect_snapshot_output(highlight("# \u2029[31mhello\u2029[m"))
 })

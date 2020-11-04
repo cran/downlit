@@ -1,3 +1,17 @@
+# downlit 0.2.1
+
+* When auto-linking `vignette(foo)`, downlit now looks for a vignette named
+  foo in the packages it knows to be attached (#61).
+
+* Can now force highlighting of any `<pre>` by wrapping it inside a `<div>`
+  with `class = "downlit"`. This is useful in cases where it may otherwise
+  be hard to set the class of the `<pre>`.
+
+* In comments, `\u2029` is converted to `\033` to make it possible to preserve
+  ANSI escapes when passed through xml2.
+
+* No longer errors on library calls with named but empty arguments.
+
 # downlit 0.2.0
 
 * Autolinking can use metadata stored in package itself with pkgdown setting
