@@ -5,15 +5,14 @@ test_that("can link function calls", {
   )
 
   expect_equal(href_expr_(foo()), "bar.html")
-  expect_equal(href_expr_(foo(1, 2, 3)), "bar.html")
   # even if namespaced
   expect_equal(href_expr_(test::foo()), "bar.html")
-  expect_equal(href_expr_(test::foo(1, 2, 3)), "bar.html")
 
-  # but function factories are ignored
+  # but functions with arguments are ignored
+  expect_equal(href_expr_(foo(1, 2, 3)), NA_character_)
+  # as are function factories are ignored
   expect_equal(href_expr_(foo()(1, 2, 3)), NA_character_)
-  # as functions with special syntax
-  expect_equal(href_expr_(if (TRUE) 1), NA_character_)
+  expect_equal(href_expr_(test::foo()(1, 2, 3)), NA_character_)
 })
 
 test_that("base function calls linked", {
@@ -51,6 +50,18 @@ test_that("can link to functions in registered packages", {
   expect_equal(href_expr_(addterm.default()), href_topic_remote("addterm", "MASS"))
 })
 
+test_that("can link to package names in registered packages", {
+  expect_equal(
+    autolink_curly("{downlit}"),
+    "<a href='https://downlit.r-lib.org/'>downlit</a>"
+  )
+
+  expect_equal(autolink_curly("{package}"), NA_character_)
+
+  # No curly = no link
+  expect_equal(autolink_curly(""), NA_character_)
+})
+
 test_that("can link to functions in base packages", {
   expect_equal(href_expr_(abbreviate()), href_topic_remote("abbreviate", "base"))
   expect_equal(href_expr_(median()), href_topic_remote("median", "stats"))
@@ -79,8 +90,8 @@ test_that("or local sites, if registered", {
   expect_equal(href_expr_(MASS::abbey), "MASS/reference/abbey.html")
 })
 
-test_that("only links bare symbols if they're infix functions", {
-  expect_equal(autolink_url("%in%"), "https://rdrr.io/r/base/match.html")
+test_that("bare bare symbols are not linked", {
+  expect_equal(autolink_url("%in%"), NA_character_)
   expect_equal(autolink_url("foo"), NA_character_)
 })
 
@@ -114,6 +125,7 @@ test_that("can link help calls", {
   expect_equal(href_expr_(help("foo", "test")), "foo.html")
   expect_equal(href_expr_(help(package = "MASS")), "https://rdrr.io/pkg/MASS/man")
   expect_equal(href_expr_(help()), NA_character_)
+  expect_equal(href_expr_(help(a$b)), NA_character_)
 })
 
 # library and friends -----------------------------------------------------
