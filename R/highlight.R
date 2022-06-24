@@ -75,6 +75,13 @@ highlight <- function(text, classes = classes_chroma(), pre_class = NULL, code =
   new <- style_token(changes$escaped, changes$href, changes$class)
   out <- replace_in_place(parsed$text, start, end, replacement = new)
 
+  # Add per-line span to match pandoc
+  lines <- strsplit(out, "\n")[[1]]
+  if (length(lines) > 0) {
+    lines <- paste0("<span>", lines, "</span>")
+  }
+  out <- paste0(lines, collapse = "\n")
+
   if (!is.null(pre_class)) {
     out <- paste0(
       "<pre class='", paste0(pre_class, collapse = " "), "'>\n",
@@ -90,9 +97,21 @@ highlight <- function(text, classes = classes_chroma(), pre_class = NULL, code =
 }
 
 style_token <- function(x, href = NA, class = NA) {
-  x <- ifelse(is.na(href), x, paste0("<a href='", href, "'>", x, "</a>"))
-  x <- ifelse(is.na(class), x, paste0("<span class='", class, "'>", x, "</span>"))
-  x
+  # Split tokens in to lines
+  lines <- strsplit(x, "\n")
+  n <- lengths(lines)
+
+  xs <- unlist(lines)
+  href <- rep(href, n)
+  class <- rep(class, n)
+
+  # Add links and class
+  xs <- ifelse(is.na(href), xs, paste0("<a href='", href, "'>", xs, "</a>"))
+  xs <- ifelse(is.na(class), xs, paste0("<span class='", class, "'>", xs, "</span>"))
+
+  # Re-combine back into lines
+  new_lines <- split(xs, rep(seq_along(x), n))
+  map_chr(new_lines, paste0, collapse = "\n")
 }
 
 # From prettycode:::replace_in_place
@@ -121,6 +140,23 @@ line_col <- function(x) {
   data.frame(line, col)
 }
 
+# utils::getParseData will truncate very long strings or tokens;
+# this function checks for that and uses the slow
+# utils::getParseText function when necessary.
+
+getFullParseData <- function(x) {
+  res <- utils::getParseData(x)
+
+  truncated <- res$terminal &
+    substr(res$text, 1, 1) == "[" &
+    nchar(res$text) > 5  # 5 is arbitrary, 2 would probably be enough
+
+  if (any(truncated))
+    res$text[truncated] <- utils::getParseText(res, res$id[truncated])
+
+  res
+}
+
 parse_data <- function(text) {
   text <- standardise_text(text)
   stopifnot(is.character(text), length(text) == 1)
@@ -130,7 +166,7 @@ parse_data <- function(text) {
     return(NULL)
   }
 
-  list(text = text, expr = expr, data = utils::getParseData(expr))
+  list(text = text, expr = expr, data = getFullParseData(expr))
 }
 
 # Highlighting ------------------------------------------------------------
@@ -168,7 +204,9 @@ token_type <- function(x, text) {
     # assignment / equals
     "LEFT_ASSIGN", "RIGHT_ASSIGN", "EQ_ASSIGN", "EQ_FORMALS", "EQ_SUB",
     # miscellaneous
-    "'$'", "'@'","'~'", "'?'", "':'", "SPECIAL"
+    "'$'", "'@'","'~'", "'?'", "':'", "SPECIAL",
+    # pipes
+    "PIPE", "PIPEBIND"
   )
   x[x %in% infix] <- "infix"
 
@@ -183,6 +221,10 @@ token_type <- function(x, text) {
   x[x == "NUM_CONST" & text %in% constant] <- "constant"
   x[x == "SYMBOL" & text %in% c("T", "F")] <- "constant"
   x[x == "NULL_CONST"] <- "constant"
+  x[x == "NULL_CONST"] <- "constant"
+
+  # Treats pipe's placeholder '_' as a SYMBOL
+  x[x == "PLACEHOLDER"] <- "SYMBOL"
 
   x
 }
@@ -290,7 +332,7 @@ token_href <- function(token, text) {
 
   fun <- c(fun, r6_new_call - 3)
 
-  href[fun] <- map_chr(text[fun], href_topic_local)
+  href[fun] <- map_chr(text[fun], href_topic_local, is_fun = TRUE)
 
   # Highlight packages
   lib_call <- which(

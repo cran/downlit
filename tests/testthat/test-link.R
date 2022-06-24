@@ -38,16 +38,20 @@ test_that("can link remote objects", {
   expect_equal(href_expr_(MASS::abbey), href_topic_remote("abbey", "MASS"))
   expect_equal(href_expr_(MASS::addterm()), href_topic_remote("addterm", "MASS"))
   expect_equal(href_expr_(MASS::addterm.default()), href_topic_remote("addterm", "MASS"))
+  expect_equal(href_expr_(base::`::`), href_topic_remote("::", "base"))
 
   # Doesn't exist
   expect_equal(href_expr_(MASS::blah), NA_character_)
 })
 
-test_that("can link to functions in registered packages", {
+test_that("can link to topics in registered packages", {
   local_options("downlit.attached" = "MASS")
 
   expect_equal(href_expr_(addterm()), href_topic_remote("addterm", "MASS"))
-  expect_equal(href_expr_(addterm.default()), href_topic_remote("addterm", "MASS"))
+  expect_equal(href_expr_(?abbey), href_topic_remote("abbey", "MASS"))
+
+  # but has to be a function
+  expect_equal(href_expr_(abbey()), NA_character_)
 })
 
 test_that("can link to package names in registered packages", {
@@ -99,6 +103,7 @@ test_that("returns NA for bad inputs", {
   expect_equal(autolink_url(""), NA_character_)
   expect_equal(autolink_url("a; b"), NA_character_)
   expect_equal(autolink_url("1"), NA_character_)
+  expect_equal(autolink_url("ls *t??ne.pb"), NA_character_)
 })
 
 # help --------------------------------------------------------------------
@@ -124,7 +129,7 @@ test_that("can link help calls", {
   expect_equal(href_expr_(help("foo")), "foo.html")
   expect_equal(href_expr_(help("foo", "test")), "foo.html")
   expect_equal(href_expr_(help(package = "MASS")), "https://rdrr.io/pkg/MASS/man")
-  expect_equal(href_expr_(help()), NA_character_)
+  expect_equal(href_expr_(help()), "https://rdrr.io/r/utils/help.html")
   expect_equal(href_expr_(help(a$b)), NA_character_)
 })
 
@@ -157,6 +162,15 @@ test_that("can link to local articles", {
   expect_equal(href_expr_(vignette("x")), "my_path/y.html")
   expect_equal(href_expr_(vignette("x", package = "test")), "my_path/y.html")
   expect_equal(href_expr_(vignette("y")), NA_character_)
+})
+
+test_that("can link to bioconductor vignettes", {
+  skip_if_not_installed("MassSpecWavelet")
+
+  expect_equal(
+    href_expr_(vignette("MassSpecWavelet", "MassSpecWavelet")),
+    "https://bioconductor.org/packages/release/bioc/vignettes/MassSpecWavelet/inst/doc/MassSpecWavelet.html"
+  )
 })
 
 test_that("can link to remote articles", {
