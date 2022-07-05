@@ -1,3 +1,10 @@
+# downlit 0.4.2
+
+* `highlight()` no longer errors if a package imputed to have been attached
+  isn't installed.
+
+* Correctly link `requireNamespace(MASS)` (#151).
+
 # downlit 0.4.1
 
 ## Syntax highlighting

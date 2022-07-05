@@ -74,7 +74,11 @@ href_expr <- function(expr) {
   if (n_args == 0) {
     href_topic(fun_name, pkg, is_fun = TRUE)
   } else if (fun_name %in% c("library", "require", "requireNamespace")) {
-    if (n_args == 1 && is.null(names(expr))) {
+    simple_call <- n_args == 1 &&
+      is.null(names(expr)) &&
+      (is_string(expr[[2]]) || (fun_name != "requireNamespace") && is_symbol(expr[[2]]))
+
+    if (simple_call) {
       pkg <- as.character(expr[[2]])
       topic <- href_package(pkg)
       if (is.na(topic)) {
@@ -211,6 +215,9 @@ href_topic_remote <- function(topic, package) {
 }
 
 is_reexported <- function(name, package) {
+  if (package == "base") {
+    return(FALSE)
+  }
   is_imported <- env_has(ns_imports_env(package), name)
   is_imported && is_exported(name, package)
 }
@@ -229,6 +236,11 @@ href_topic_reexported <- function(topic, package) {
 
   obj <- env_get(ns, topic, inherit = TRUE)
   ex_package <- find_reexport_source(obj, ns, topic)
+  # Give up if we're stuck in an infinite loop
+  if (package == ex_package) {
+    return(NA_character_)
+  }
+
   href_topic_remote(topic, ex_package)
 }
 
