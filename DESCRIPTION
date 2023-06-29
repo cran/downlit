@@ -1,8 +1,8 @@
 Package: downlit
 Title: Syntax Highlighting and Automatic Linking
-Version: 0.4.2
+Version: 0.4.3
 Authors@R: c(
-    person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
+    person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("RStudio", role = c("cph", "fnd"))
   )
 Description: Syntax highlighting of R code, specifically designed for the
@@ -21,11 +21,11 @@ Suggests: covr, htmltools, jsonlite, MASS, MassSpecWavelet, pkgload,
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-07-05 02:12:58 UTC; hadleywickham
+Packaged: 2023-06-29 22:06:14 UTC; hadleywickham
 Author: Hadley Wickham [aut, cre],
   RStudio [cph, fnd]
-Maintainer: Hadley Wickham <hadley@rstudio.com>
+Maintainer: Hadley Wickham <hadley@posit.co>
 Repository: CRAN
-Date/Publication: 2022-07-05 03:00:02 UTC
+Date/Publication: 2023-06-29 22:40:08 UTC
