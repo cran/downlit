@@ -1,3 +1,7 @@
+# downlit 0.4.4
+
+* Use simpler parsing algorithm for R 4.0, which avoids crash with certain UTF-8 characters (#189).
+
 # downlit 0.4.3
 
 * Fix for upcoming R-devel (#169).
